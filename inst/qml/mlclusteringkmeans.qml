@@ -36,12 +36,12 @@ Form {
     GroupBox {
         title: qsTr("Tables")
 
-        CheckBox { text: qsTr("AIC/BIC weights") ; name: "aicweights"}
         CheckBox { text: qsTr("Cluster information") ; name: "tableClusterInformation" ; enabled: true ; id: clusterInfo; checked: true
           CheckBox { text: qsTr("Centroids") ; name: "tableClusterInfoCentroids" ; checked: false}
           CheckBox { text: qsTr("Between sum of squares") ; name: "tableClusterInfoBetweenSumSquares" ; checked: false}
           CheckBox { text: qsTr("Total sum of squares") ; name: "tableClusterInfoTotalSumSquares" ; checked: false}
       }
+      CheckBox { text: qsTr("AIC/BIC weights") ; name: "aicweights"}
     }
 
     GroupBox {
@@ -60,7 +60,6 @@ Form {
               name: "modelOpt"
               RadioButton { text: qsTr("AIC")                             ; name: "validationAIC" }
               RadioButton { text: qsTr("BIC")                             ; name: "validationBIC" ; checked: true }
-              RadioButton { text: qsTr("R\u00B2")                         ; name: "validationRsquared" ; id: mse }
               RadioButton { text: qsTr("Manual")                          ; name: "validationManual"; id: validationManual }
           }
 
@@ -77,10 +76,9 @@ Form {
                       ListElement { key: "MacQueen"                 ; value: "MacQueen" }
                   }
               }
-            GroupBox {
-                CheckBox { name: "seedBox"; text: qsTr("Set seed:"); childrenOnSameRow: true
-                    DoubleField  { name: "seed"; defaultValue: 1; min: -999999; max: 999999; fieldWidth: 60 }
-                }
+              CheckBox { text: qsTr("Scale variables") ; name: "scaleEqualSD"; checked: true}
+              CheckBox { name: "seedBox"; text: qsTr("Set seed:"); childrenOnSameRow: true
+                  DoubleField  { name: "seed"; defaultValue: 1; min: -999999; max: 999999; fieldWidth: 60 }
               }
           }
         }

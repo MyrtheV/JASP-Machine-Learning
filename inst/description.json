@@ -10,7 +10,11 @@
 		"license":									"GPL (>= 2)"
 	},
 
-	"requiredPackages":	[],
+	"requiredPackages":	[
+		{ "package" : "kknn" },
+		{ "package" : "Rtsne" },
+		{ "package" : "colorspace" }
+	],
 
 	"ribbonEntries":
 	[

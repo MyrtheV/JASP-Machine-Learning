@@ -41,6 +41,9 @@ MLClusteringKMeans <- function(jaspResults, dataset, options, ...) {
   if (is.null(dataset)) {
           dataset <- .readDataSetToEnd(columns.as.numeric = predictors, exclude.na.listwise = predictors)
   }
+  if(options[["scaleEqualSD"]]){
+    dataset <- scale(dataset)
+  }
   return(dataset)
 }
 
@@ -75,7 +78,7 @@ MLClusteringKMeans <- function(jaspResults, dataset, options, ...) {
     }
     jaspResults[["res"]] <- createJaspState(res)
     jaspResults[["res"]]$dependOnOptions(c("predictors", "noOfClusters","noOfRandomSets", "noOfIterations", "algorithm", "modelOpt", "seed", 
-                                              "maxClusters", "seedBox"))
+                                              "maxClusters", "seedBox", "scaleEqualSD"))
 
     return(jaspResults[["res"]]$object)
 }
@@ -114,16 +117,14 @@ MLClusteringKMeans <- function(jaspResults, dataset, options, ...) {
 .kMeansClusteringOptimized <- function(dataset, options){
 
     WSS <- numeric(options[["maxClusters"]] - 1) # take as the max half of the N
-    clusters <- 1:options[["maxClusters"]]
 
     res<-list()
     res[['clusterrange']] <- 1:options[["maxClusters"]]
 
-    for(i in seq_along(clusters)){
+    for(i in 1:options[["maxClusters"]]){
 
-        clusterIndex <- clusters[i]
         kfit_tmp <- kmeans(dataset[, .v(options[["predictors"]])],
-                           centers = clusterIndex,
+                           centers = i,
                            iter.max = options[['noOfIterations']],
                            nstart = options[['noOfRandomSets']],
                            algorithm = options[['algorithm']])
@@ -140,9 +141,7 @@ MLClusteringKMeans <- function(jaspResults, dataset, options, ...) {
         res[['BSS_store']][i] <- kfit_tmp$betweenss
         res[["rsquare_store"]][i] <- res[['BSS_store']][i]/res[['TSS_store']][i]
     }
-    if(options[["modelOpt"]] == "validationRsquared"){
-      res[['clusters']] <- res[["clusterrange"]][[which.max(res[["rsquare_store"]])]]
-    } else if(options[["modelOpt"]] == "validationAIC"){
+    if(options[["modelOpt"]] == "validationAIC"){
       res[['clusters']] <- res[["clusterrange"]][[which.min(res[["AIC_store"]])]]
     } else if(options[["modelOpt"]] == "validationBIC"){
       res[['clusters']] <- res[["clusterrange"]][[which.min(res[["BIC_store"]])]]
@@ -153,6 +152,7 @@ MLClusteringKMeans <- function(jaspResults, dataset, options, ...) {
                        iter.max = options[['noOfIterations']],
                        nstart = options[['noOfRandomSets']],
                        algorithm = options[['algorithm']])
+    res[["model"]] <- kfit
     res[['Predictions']] <- data.frame(
         'Observation' = 1:nrow(dataset),
         'Cluster' = kfit$cluster
@@ -184,7 +184,7 @@ MLClusteringKMeans <- function(jaspResults, dataset, options, ...) {
   jaspResults[["evaluationTable"]]      <- evaluationTable
   jaspResults[["evaluationTable"]]$position <- 1
   evaluationTable$dependOnOptions(c("predictors", "noOfClusters","noOfRandomSets", "noOfIterations", "algorithm",
-                                      "aicweights", "modelOpt", "seed", "maxClusters"))
+                                      "aicweights", "modelOpt", "seed", "maxClusters", "scaleEqualSD"))
 
   evaluationTable$addColumnInfo(name = 'clusters', title = 'Clusters', type = 'integer')
   evaluationTable$addColumnInfo(name = 'measure', title = 'R\u00B2', type = 'number', format = 'dp:2')
@@ -201,6 +201,11 @@ MLClusteringKMeans <- function(jaspResults, dataset, options, ...) {
 
   if(!ready)
     return()
+    
+  if(res[["clusters"]] == options[["maxClusters"]] && options[["modelOpt"]] != "validationManual"){
+    message <- "The optimum number of clusters is the maximum number of clusters. You might want to adjust the range op optimization."
+    evaluationTable$addFootnote(message=message, symbol="<i>Note.</i>")
+  }
 
   row <- data.frame(clusters = res[['clusters']], measure = res[['BSS']]/res[['TSS']], aic = res[['AIC']], bic = res[['BIC']], n = res[["N"]])
   if(options[["aicweights"]])
@@ -218,7 +223,7 @@ MLClusteringKMeans <- function(jaspResults, dataset, options, ...) {
     jaspResults[["clusterInfoTable"]]       <- clusterInfoTable
     clusterInfoTable$dependOnOptions(c("tableClusterInformation","predictors", "modelOpt",
                                         "noOfClusters","noOfRandomSets", "tableClusterInfoSize",
-                                        "tableClusterInfoSumSquares", "tableClusterInfoCentroids",
+                                        "tableClusterInfoSumSquares", "tableClusterInfoCentroids", "scaleEqualSD",
                                         "tableClusterInfoBetweenSumSquares", "tableClusterInfoTotalSumSquares", "maxClusters"))
     clusterInfoTable$position               <- 2
     clusterInfoTable$transpose              <- TRUE
@@ -283,10 +288,12 @@ MLClusteringKMeans <- function(jaspResults, dataset, options, ...) {
       
       tsne_plot <- data.frame(x = tsne_out$Y[,1], y = tsne_out$Y[,2], col = pred.values)
       p <- ggplot2::ggplot(tsne_plot) + ggplot2::geom_point(ggplot2::aes(x = x, y = y, fill = factor(col)), size = 4, stroke = 1, shape = 21, color = "black") + ggplot2::xlab(NULL) + ggplot2::ylab(NULL)
+      p <- p + ggplot2::scale_fill_manual(values = colorspace::qualitative_hcl(n = res[["clusters"]]))
       p <- JASPgraphs::themeJasp(p)
-      jaspResults[["plot2dCluster"]] 		<- createJaspPlot(plot = p, title= "Cluster Plot", width = 400, height = 300)
+      p <- p + ggplot2::theme(axis.ticks = ggplot2::element_blank(), axis.text.x = ggplot2::element_blank(), axis.text.y = ggplot2::element_blank())
+      jaspResults[["plot2dCluster"]] 		<- createJaspPlot(plot = p, title= "T-sne Cluster Plot", width = 400, height = 300)
       jaspResults[["plot2dCluster"]]		$dependOnOptions(c("predictors", "noOfClusters","noOfRandomSets", "noOfIterations", "algorithm",
-                                          "aicweights", "modelOpt", "ready", "seed", "plot2dCluster", "maxClusters"))
+                                          "aicweights", "modelOpt", "ready", "seed", "plot2dCluster", "maxClusters", "scaleEqualSD"))
       jaspResults[["plot2dCluster"]] 		$position <- 3
     }
   }
@@ -316,7 +323,7 @@ MLClusteringKMeans <- function(jaspResults, dataset, options, ...) {
    
      jaspResults[["optimPlot"]] 		 <- createJaspPlot(plot = p, title= "Within Sum of Squares Plot", height = 300, width = 400)
      jaspResults[["optimPlot"]]		   $dependOnOptions(c("predictors", "noOfClusters","noOfRandomSets", "noOfIterations", "algorithm",
-                                         "aicweights", "modelOpt", "ready", "seed", "withinssPlot"))
+                                         "aicweights", "modelOpt", "ready", "seed", "withinssPlot", "scaleEqualSD"))
      jaspResults[["optimPlot"]] 		 $position <- 4
      }
   }

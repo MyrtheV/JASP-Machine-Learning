@@ -33,7 +33,7 @@ MLRegressionKNN <- function(jaspResults, dataset, options, state=NULL) {
 
 .knnRegression <- function(dataset, options, jaspResults, ready){
 	
-	if(!is.null(jaspResults[["res"]])) return(jaspResults[["res"]]$object)
+	if(!is.null(jaspResults[["res"]]$object)) return(jaspResults[["res"]]$object)
 	
 	# set the seed so that every time the same set is chosen (to prevent random results) ##
 	if(options[["seedBox"]])
@@ -86,6 +86,12 @@ MLRegressionKNN <- function(jaspResults, dataset, options, state=NULL) {
 	res[['Distances']] 				<- as.matrix(knn.fit$D)
 	res[["ntrain"]] 					<- nrow(train)
 	res[["ntest"]] 						<- nrow(test)
+	res[["rsquare"]] 					<- round(cor(knn.fit$fitted.values, y)^2, 2)
+	
+	knn.train <- kknn::kknn(formula = formula, train = train, test = train, k = options[['noOfNearestNeighbours']], distance = options[['distanceParameterManual']],
+												kernel = options[['weights']], scale = options[['scaleEqualSD']])
+	res[["trainingError"]]		<- mean((knn.train$fitted.values - y)^2)
+	
 	return(res)
 }
 
@@ -114,6 +120,9 @@ MLRegressionKNN <- function(jaspResults, dataset, options, state=NULL) {
 	# }
 	res[["ntrain"]] 							<- nrow(dataset)
 	res[["ntest"]] 								<- nrow(dataset)
+	y 														<- dataset[, .v(options[["target"]])]
+	res[["trainingError"]]				<- mean((predict(knn.fit, newdata = dataset) - y)^2)
+	res[["rsquare"]] 							<- cor(predict(knn.fit, newdata = dataset), dataset[,.v(options[["target"]])])^2
 
 	return(res)
 }
@@ -123,18 +132,22 @@ MLRegressionKNN <- function(jaspResults, dataset, options, state=NULL) {
 	knn.fit <- kknn::cv.kknn(formula = formula, data = dataset, kcv = options[['noOfFolds']], distance = options[['distanceParameterManual']],
 							 kernel = options[['weights']], scale = options[['scaleEqualSD']], k = options[["noOfNearestNeighbours"]])
 							 
-	MSE <- mean((knn.fit[[1]][,1] - knn.fit[[1]][,2])^2)
 	res <- list()
 	# result[['Predictions']] <- data.frame(
 	# 	'Observation' = 1:nrow(dataset),
 	# 	'True' = as.numeric(knn.fit[[1]][,1]),
 	# 	'Prediction' = as.numeric(knn.fit[[1]][,2]))
-	res[['optimal.error']] 							<- MSE
+	res[['optimal.error']] 							<- mean((knn.fit[[1]][,1] - knn.fit[[1]][,2])^2)
 	res[['optimal.k']] 									<- options[["noOfNearestNeighbours"]]
 	res[["optimal.distance"]] 					<- options[["distanceParameterManual"]]
 	res[['optimal.weights']] 						<- options[["weights"]]
 	res[["ntrain"]] 										<- nrow(dataset)
 	res[["ntest"]] 											<- nrow(dataset)
+	res[["rsquare"]] 										<- cor(knn.fit[[1]][,2], dataset[,.v(options[["target"]])])^2
+	
+	knn.train <- kknn::cv.kknn(formula = formula, data = dataset, kcv = options[['noOfFolds']], distance = options[['distanceParameterManual']],
+							 kernel = options[['weights']], scale = options[['scaleEqualSD']], k = options[["noOfNearestNeighbours"]])
+	res[["trainingError"]] <- mean((knn.train[[1]][,1] - knn.train[[1]][,2])^2)
 	
 	return(res)
 }
@@ -150,9 +163,10 @@ MLRegressionKNN <- function(jaspResults, dataset, options, state=NULL) {
   evaluationTable$position <- 1
 
   evaluationTable$addColumnInfo(name = 'nn', title = 'No. nearest neighbors', type = 'integer')
-  evaluationTable$addColumnInfo(name = 'testError', title = 'Test set error', type = 'number', format = 'dp:3')
+  evaluationTable$addColumnInfo(name = 'testError', title = 'Test error', type = 'number', format = 'dp:3')
 	if(options[["trainingAccuracy"]])
-		evaluationTable$addColumnInfo(name = 'trainingError', title = 'Training set error', type = 'number', format = 'dp:3')
+		evaluationTable$addColumnInfo(name = 'trainingError', title = 'Training error', type = 'number', format = 'dp:3')
+	evaluationTable$addColumnInfo(name = 'rsquare', title = 'R\u00B2', type = 'number', format = 'dp:2')
 	evaluationTable$addColumnInfo(name = 'weights', title = 'Weights', type = 'string')
 	evaluationTable$addColumnInfo(name = 'distance', title = 'Distance', type = 'string')
 	evaluationTable$addColumnInfo(name = 'ntrain', title = 'n(Train)', type = 'number')
@@ -161,14 +175,22 @@ MLRegressionKNN <- function(jaspResults, dataset, options, state=NULL) {
 	if(!ready)
 		return()
 		
+	if(res[["optimal.k"]] == options[["maxK"]] && options[["modelOpt"]] != "validationManual"){
+    message <- "The optimum number of nearest neighbors is the maximum number. You might want to adjust the range op optimization."
+    evaluationTable$addFootnote(message=message, symbol="<i>Note.</i>")
+  }
+		
 	distance  <- ifelse(res[["optimal.distance"]] == 1, yes = "Euclidian", no = "Manhattan")
   weights   <- res[["optimal.weights"]]
   nn        <- res[['optimal.k']]
   error     <- res[['optimal.error']]
   ntrain    <- res[["ntrain"]]
   ntest     <- res[["ntest"]]
+	rsquare 	<- res[["rsquare"]]
     
-  row <- data.frame(nn = nn, testError = error, distance = distance, weights = weights, ntrain = ntrain, ntest = ntest)
+  row <- data.frame(nn = nn, testError = error, rsquare = rsquare, distance = distance, weights = weights, ntrain = ntrain, ntest = ntest)
+	if(options[["trainingAccuracy"]])
+		row <- cbind(row, trainingError = res[["trainingError"]])  
   evaluationTable$addRows(row)
 }
 
@@ -180,13 +202,16 @@ MLRegressionKNN <- function(jaspResults, dataset, options, state=NULL) {
   } else if(options[['plotErrorVsK']] && options[["modelOpt"]] != "validationManual"){
      if(is.null(jaspResults[["plotErrorVsK"]])){
        
-       error 										<- 1:options[["maxK"]]
-       dataset                 	<- na.omit(dataset)
-       train.index             	<- sample(c(TRUE,FALSE),nrow(dataset),replace = TRUE,prob = c(options[['trainingDataManual']],1-options[['trainingDataManual']]))
-       train                   	<- dataset[train.index, ]
-       test                    	<- dataset[!train.index, ]
+      error 										<- 1:options[["maxK"]]
+      dataset                 	<- na.omit(dataset)
       formula                 	<- .makeformulaClassification(options, ready)
-       for(i in 1:options[["maxK"]]){
+       
+			 for(i in 1:options[["maxK"]]){
+				 
+				 train.index             	<- sample(c(TRUE,FALSE),nrow(dataset),replace = TRUE,prob = c(options[['trainingDataManual']],1-options[['trainingDataManual']]))
+				 train                   	<- dataset[train.index, ]
+				 test                    	<- dataset[!train.index, ]
+				 
 				 knn.fit <- kknn::kknn(formula = formula, train = train, test = test, k = i, distance = res[["optimal.distance"]],
 			                         kernel = res[['optimal.weights']], scale = options[['scaleEqualSD']])
 				 

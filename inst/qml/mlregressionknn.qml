@@ -70,6 +70,8 @@ Form {
         title: qsTr("Plots")
         
         CheckBox { text: qsTr("Mean squared error") ; name: "plotErrorVsK"; enabled: validationManual.checked ? false : true }
+        CheckBox { text: qsTr("Predicted performance (training)") ; name: "predictedPerformanceTraining" }
+        CheckBox { text: qsTr("Predicted performance (test)") ; name: "predictedPerformanceTest" }
     }
     
     Section {
@@ -98,8 +100,15 @@ Form {
               IntegerField { name: "noOfNearestNeighbours"; text: qsTr("No. of nearest neighbors:") ; defaultValue: 1 ; min: 1; max: 999999; fieldWidth: 60; enabled: validationManual.checked }
               IntegerField { name: "maxK"; text: qsTr("Max. nearest neighbors:") ; defaultValue: 10 ; min: 1; max: 999999; fieldWidth: 60; enabled: validationManual.checked ? false : true }
               PercentField { name: "trainingDataManual"; text: qsTr("Data used for training:")       ; defaultValue: 80; enabled: validationManual.checked }
-              IntegerField { name: "distanceParameterManual"; text: qsTr("Distance parameter:")       ; defaultValue: 1; min: 1; max: 2; enabled: validationManual.checked }
               ComboBox {
+                  name: "distanceParameterManual"
+                  label: qsTr("Distance:")
+                  enabled: validationManual.checked
+                  model: ListModel {
+                      ListElement { key: 1                ; value: "1"; name: "Manhattan" }
+                      ListElement { key: 2                ; value: "2"; name: "Euclidian" }
+                  }
+              }ComboBox {
                   name: "weights"
                   label: qsTr("Weights:")
                   enabled: validationManual.checked
