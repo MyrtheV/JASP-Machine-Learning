@@ -9,3 +9,7 @@ export(MLClassificationLDA)
 export(MLClusteringKMeans)
 export(MLFuzzyCMeans)
 export(MLClusteringDensityBased)
+  import('kknn');
+  import('Rtsne');
+  import('colorspace');
+  import('ppclust');

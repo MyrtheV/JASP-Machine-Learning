@@ -13,7 +13,8 @@
 	"requiredPackages":	[
 		{ "package" : "kknn" },
 		{ "package" : "Rtsne" },
-		{ "package" : "colorspace" }
+		{ "package" : "colorspace" },
+		{ "package" : "ppclust" }
 	],
 
 	"ribbonEntries":
