@@ -1,110 +1,93 @@
 {
 	"moduleDescription" :
 	{
-		"title" : 									"Machine Learning",
+		"title" : 								"Machine Learning",
 		"description": 							"A module for Machine Learning",
-		"version":									0.1,
-		"author":										"JASP Team",
-		"maintainer":								"JASP Team <info@jasp-stats.org>",
-		"website":									"www.jasp-stats.org",
-		"license":									"GPL (>= 2)"
+		"version":								"0.1",
+		"author":								"JASP Team",
+		"maintainer":							"JASP Team <info@jasp-stats.org>",
+		"website":								"www.jasp-stats.org",
+		"license":								"GPL (>= 2)",
+		"icon": 								"analysis-ml-clustering.svg"
 	},
 
-	"requiredPackages":	[
-		{ "package" : "kknn" },
-		{ "package" : "Rtsne" },
-		{ "package" : "colorspace" },
-		{ "package" : "ppclust" }
-	],
+	// "requiredPackages":	[
+	// 	{ "package" : "kknn" },
+	// 	{ "package" : "Rtsne" },
+	// 	{ "package" : "colorspace" },
+	// 	{ "package" : "ppclust" },
+	//	{ "package" : "gbm" }
+	// ],
+	"requiredPackages":	[ ],
 
-	"ribbonEntries":
-	[
-		{
-			"title": 									"Regression",
-			"icon": 									"analysis-ml-regression.svg",
-			"analyses":
-			[
-				{
-					"title":							"Boosting",
-					"qml":								"mlregressionboosting.qml",
-					"function":						"MLRegressionBoosting",
-					"usesJaspResults":		true
-				},
-				{
-					"title":							"K-Nearest Neighbors",
-					"qml":								"mlregressionknn.qml",
-					"function":						"MLRegressionKNN",
-					"usesJaspResults":		true
-				},
-				{
-					"title":							"Random Forest",
-					"qml":								"mlregressionrandomforest.qml",
-					"function":						"MLRegressionRandomForest",
-					"usesJaspResults":		true
-				},
-				{
-					"title":							"Regularized Linear Regression",
-					"qml":								"mlregressionregularized.qml",
-					"function":						"MLRegressionRegularized",
-					"usesJaspResults":		true
-				}
-			]
-		},
-		{
-			"title": 									"Classification",
-			"icon": 									"analysis-ml-classification.svg",
-			"analyses":
-			[
-				{
-					"title":							"Boosting",
-					"qml":								"mlclassificationboosting.qml",
-					"function":						"MLClassificationBoosting",
-					"usesJaspResults":		true
-				},
-				{
-					"title":							"K-Nearest Neighbors",
-					"qml":								"mlclassificationknn.qml",
-					"function":						"MLClassificationKNN",
-					"usesJaspResults":		true
-				},
-				{
-					"title":							"Random Forest",
-					"qml":								"mlclassificationrandomforest.qml",
-					"function":						"MLClassificationRandomForest",
-					"usesJaspResults":		true
-				},
-				{
-					"title": 							"Linear Discriminant Analysis",
-					"qml": 								"mlclassificationlda.qml",
-					"function": 					"MLClassificationLDA",
-					"usesJaspResults": 		true
-				}
-			]
-		},
-		{
-			"title": 									"Clustering",
-			"icon": 									"analysis-ml-clustering.svg",
-			"analyses":
-			[
-				{
-					"title":							"K-Means",
-					"qml":								"mlclusteringkmeans.qml",
-					"function":						"MLClusteringKMeans",
-					"usesJaspResults":		true
-				},
-				{
-					"title":							"Fuzzy c-means",
-					"qml":								"mlfuzzycmeans.qml",
-					"function":						"MLFuzzyCMeans",
-					"usesJaspResults":		true
-				},
-				{
-					"title":							"Density based",
-					"qml":								"mlclusteringdensitybased.qml",
-					"function":						"MLClusteringDensityBased",
-					"usesJaspResults":		true
-				}
-			]
-		}
-	]
+	"menu":
+		[
+			{
+				"title": 							"Regression",
+				"icon": 							"analysis-ml-regression.svg"
+			},
+			{
+				"title":							"Boosting",
+				"qml":								"mlregressionboosting.qml",
+				"function":							"MLRegressionBoosting"
+			},
+			{
+				"title":							"K-Nearest Neighbors",
+				"qml":								"mlregressionknn.qml",
+				"function":							"MLRegressionKNN"
+			},
+			{
+				"title":							"Random Forest",
+				"qml":								"mlregressionrandomforest.qml",
+				"function":							"MLRegressionRandomForest"
+			},
+			{
+				"title":							"Regularized Linear Regression",
+				"qml":								"mlregressionregularized.qml",
+				"function":							"MLRegressionRegularized"
+			},
+			{
+				"title": 							"Classification",
+				"icon": 							"analysis-ml-classification.svg"
+			},
+			{
+				"title":							"Boosting",
+				"qml":								"mlclassificationboosting.qml",
+				"function":							"MLClassificationBoosting"
+			},
+			{
+				"title":							"K-Nearest Neighbors",
+				"qml":								"mlclassificationknn.qml",
+				"function":							"MLClassificationKNN"
+			},
+			{
+				"title": 							"Linear Discriminant Analysis",
+				"qml": 								"mlclassificationlda.qml",
+				"function": 						"MLClassificationLDA"
+			},
+			{
+				"title":							"Random Forest",
+				"qml":								"mlclassificationrandomforest.qml",
+				"function":							"MLClassificationRandomForest"
+			},
+			{
+				"title": 							"Clustering",
+				"icon": 							"analysis-ml-clustering.svg"
+			},
+			{
+				"title":							"Density based",
+				"qml":								"mlclusteringdensitybased.qml",
+				"function":							"MLClusteringDensityBased"
+			},
+			{
+				"title":							"Fuzzy c-means",
+				"qml":								"mlfuzzycmeans.qml",
+				"function":							"MLFuzzyCMeans"
+			},
+			{
+				"title":							"K-Means",
+				"qml":								"mlclusteringkmeans.qml",
+				"function":							"MLClusteringKMeans"
+			}
+		]
 }

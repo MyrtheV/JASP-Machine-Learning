@@ -17,24 +17,25 @@
 
 MLFuzzyCMeans <- function(jaspResults, dataset, options, ...) {
   
-  #old <- .libPaths()
-  #on.exit(.libPaths(old))
-  #.libPaths("/Library/Frameworks/R.framework/Versions/3.5/Resources/library")
-  
-  jaspResults$title   <- "Fuzzy C-means Clustering"
   # read variables ##
   dataset             <- .cMeansClusteringReadData(dataset, options)
+  
   # error handling & code variable names in base64
   .cMeansClusteringErrorHandling(dataset, options)
   ready               <- length(options[["predictors"]][options[["predictors"]] != ""] > 0)
+  
   # Run the analysis and save the results
   res                 <- .cMeansClustering(dataset, options, jaspResults, ready)
+  
   # create the evaluation table
   .cMeansClusteringSummaryTable(res, options, jaspResults, ready)
+  
   # create the cluster information table
   .cMeansClusteringInformationTable(options, res, jaspResults, ready)
+  
   # Create the cluster plot
   .cMeansClusterPlot(dataset, options, res, jaspResults, ready)
+  
   # Create the within ss vs cluster plot
   .cMeansWithinSumOfSquaresPlot(options, res, jaspResults, ready)
 }
@@ -81,7 +82,7 @@ MLFuzzyCMeans <- function(jaspResults, dataset, options, ...) {
     res <- list()
   }
   jaspResults[["res"]] <- createJaspState(res)
-  jaspResults[["res"]]$dependOnOptions(c("predictors", "noOfClusters", "noOfIterations", "modelOpt", "seed", 
+  jaspResults[["res"]]$dependOn(options =c("predictors", "noOfClusters", "noOfIterations", "modelOpt", "seed", 
                                          "maxClusters", "seedBox", "scaleEqualSD"))
   
   return(jaspResults[["res"]]$object)
@@ -230,7 +231,7 @@ MLFuzzyCMeans <- function(jaspResults, dataset, options, ...) {
   evaluationTable                       <- createJaspTable("K-Means Clustering Model Summary")
   jaspResults[["evaluationTable"]]      <- evaluationTable
   jaspResults[["evaluationTable"]]$position <- 1
-  evaluationTable$dependOnOptions(c("predictors", "noOfClusters", "noOfIterations", "algorithm",
+  evaluationTable$dependOn(options =c("predictors", "noOfClusters", "noOfIterations", "algorithm",
                                     "aicweights", "modelOpt", "seed", "maxClusters", "scaleEqualSD"))
   
   evaluationTable$addColumnInfo(name = 'clusters', title = 'Clusters', type = 'integer')
@@ -268,7 +269,7 @@ MLFuzzyCMeans <- function(jaspResults, dataset, options, ...) {
     
     clusterInfoTable                        <- createJaspTable("Cluster Information")
     jaspResults[["clusterInfoTable"]]       <- clusterInfoTable
-    clusterInfoTable$dependOnOptions(c("tableClusterInformation","predictors", "modelOpt",
+    clusterInfoTable$dependOn(options =c("tableClusterInformation","predictors", "modelOpt",
                                        "noOfClusters", "tableClusterInfoSize",
                                        "tableClusterInfoSumSquares", "tableClusterInfoCentroids", "scaleEqualSD",
                                        "tableClusterInfoBetweenSumSquares", "tableClusterInfoTotalSumSquares", "maxClusters"))
@@ -339,7 +340,7 @@ MLFuzzyCMeans <- function(jaspResults, dataset, options, ...) {
       p <- JASPgraphs::themeJasp(p)
       p <- p + ggplot2::theme(axis.ticks = ggplot2::element_blank(), axis.text.x = ggplot2::element_blank(), axis.text.y = ggplot2::element_blank())
       jaspResults[["plot2dCluster"]] 		<- createJaspPlot(plot = p, title= "T-sne Cluster Plot", width = 400, height = 300)
-      jaspResults[["plot2dCluster"]]		$dependOnOptions(c("predictors", "noOfClusters", "noOfIterations",
+      jaspResults[["plot2dCluster"]]		$dependOn(options =c("predictors", "noOfClusters", "noOfIterations",
                                                          "aicweights", "modelOpt", "ready", "seed", "plot2dCluster", "maxClusters", "scaleEqualSD"))
       jaspResults[["plot2dCluster"]] 		$position <- 3
     }
@@ -369,7 +370,7 @@ MLFuzzyCMeans <- function(jaspResults, dataset, options, ...) {
       p <- JASPgraphs::themeJasp(p)
       
       jaspResults[["optimPlot"]] 		 <- createJaspPlot(plot = p, title= "Within Sum of Squares Plot", height = 300, width = 400)
-      jaspResults[["optimPlot"]]		   $dependOnOptions(c("predictors", "noOfClusters", "noOfIterations",
+      jaspResults[["optimPlot"]]		   $dependOn(options =c("predictors", "noOfClusters", "noOfIterations",
                                                         "aicweights", "modelOpt", "ready", "seed", "withinssPlot", "scaleEqualSD"))
       jaspResults[["optimPlot"]] 		 $position <- 4
     }

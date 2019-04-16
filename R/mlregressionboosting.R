@@ -17,9 +17,6 @@
 
 MLRegressionBoosting <- function(jaspResults, dataset, options, ...) {
   
-  # Set title
-  jaspResults$title <- "Boosting Regression"
-  
   # Read dataset
   dataset <- .regBoostReadData(dataset, options)
   
@@ -182,7 +179,7 @@ MLRegressionBoosting <- function(jaspResults, dataset, options, ...) {
   
   # Save results to state
   jaspResults[["stateClassBoostResults"]] <- createJaspState(results)
-  jaspResults[["stateClassBoostResults"]]$dependOnOptions(c("target", "predictors", "indicator", "applyModel",
+  jaspResults[["stateClassBoostResults"]]$dependOn(options =c("target", "predictors", "indicator", "applyModel",
                                                             "noOfTrees", "numberOfTrees", "shrinkage", "shrinkPar",
                                                             "int.depth", "int.depth.parameter", "modelOptimization",
                                                             "cvFolds", "nNode", "nNodeSpec", "dataTrain",
@@ -244,7 +241,7 @@ MLRegressionBoosting <- function(jaspResults, dataset, options, ...) {
   # Create table and bind to jaspResults
   regBoostTable <- createJaspTable(title = "Boosting Regression Model Summary")
   jaspResults[["regBoostTable"]] <- regBoostTable
-  jaspResults[["regBoostTable"]]$dependOnOptions(c("target", "predictors", "indicator", "applyModel", "noOfTrees",
+  jaspResults[["regBoostTable"]]$dependOn(options =c("target", "predictors", "indicator", "applyModel", "noOfTrees",
                                                    "numberOfTrees", "shrinkage", "shrinkPar", "int.depth",
                                                    "int.depth.parameter", "modelOptimization", "cvFolds", "nNode",
                                                    "nNodeSpec", "dataTrain", "percentageDataTraining", "bag.fraction",
@@ -280,8 +277,8 @@ MLRegressionBoosting <- function(jaspResults, dataset, options, ...) {
   # Create table
   regBoostRelInfTable <- createJaspTable(title = "Relative Influence")
   jaspResults[["regBoostRelInfTable"]] <- regBoostRelInfTable
-  jaspResults[["regBoostRelInfTable"]]$copyDependenciesFromJaspObject(jaspResults[["regBoostTable"]])
-  jaspResults[["regBoostRelInfTable"]]$dependOnOptions("regBoostRelInfTable")
+  jaspResults[["regBoostRelInfTable"]]$dependOn(optionsFromObject =jaspResults[["regBoostTable"]])
+  jaspResults[["regBoostRelInfTable"]]$dependOn(options ="regBoostRelInfTable")
   
   # Add column info
   regBoostRelInfTable$addColumnInfo(name = "predictor",  title = " ", type = "string")
@@ -299,8 +296,8 @@ MLRegressionBoosting <- function(jaspResults, dataset, options, ...) {
   # Create table and bind to jaspResults
   regBoostApplyTable <- createJaspTable(title = "Boosting Model Predictions")
   jaspResults[["regBoostApplyTable"]] <- regBoostApplyTable
-  jaspResults[["regBoostApplyTable"]]$copyDependenciesFromJaspObject(jaspResults[["regBoostTable"]])
-  jaspResults[["regBoostApplyTable"]]$dependOnOptions("applyModel")
+  jaspResults[["regBoostApplyTable"]]$dependOn(optionsFromObject =jaspResults[["regBoostTable"]])
+  jaspResults[["regBoostApplyTable"]]$dependOn(options ="applyModel")
   
   # Add column info
   regBoostApplyTable$addColumnInfo(name = "case",  title = "Case"      , type = "integer")
@@ -326,7 +323,7 @@ MLRegressionBoosting <- function(jaspResults, dataset, options, ...) {
   regBoostRelInfPlot <- createJaspPlot(plot = relInfPlot, title = "Relative Influence Plot",
                                          width = 500, height = 20 * nrow(regBoostResults$relInf) + 60)
   jaspResults[["regBoostRelInfPlot"]] <- regBoostRelInfPlot
-  jaspResults[["regBoostRelInfPlot"]]$dependOnOptions("plotRelInf")
+  jaspResults[["regBoostRelInfPlot"]]$dependOn(options ="plotRelInf")
 }
 
 .regBoostPlotDeviance <- function(jaspResults, options, regBoostResults, ready, analysisOptions) {
@@ -351,8 +348,8 @@ MLRegressionBoosting <- function(jaspResults, dataset, options, ...) {
   # Create plot and bind to jaspResults
   plotDeviance <- createJaspPlot(plot = plotDeviance, title = "Deviance Plot", width = 500, height = 400)
   jaspResults[["plotDeviance"]] <- plotDeviance
-  jaspResults[["plotDeviance"]]$copyDependenciesFromJaspObject(jaspResults[["regBoostTable"]])
-  jaspResults[["plotDeviance"]]$dependOnOptions("plotDeviance")
+  jaspResults[["plotDeviance"]]$dependOn(optionsFromObject =jaspResults[["regBoostTable"]])
+  jaspResults[["plotDeviance"]]$dependOn(options ="plotDeviance")
 }
 
 .regBoostPlotOOBChangeDev <- function(jaspResults, options, regBoostResults, ready, analysisOptions) {
@@ -373,8 +370,8 @@ MLRegressionBoosting <- function(jaspResults, dataset, options, ...) {
   regBoostPlotOOBChangeDev <- createJaspPlot(plot = plotOOBChangeDev,title = "OOB Improvement Plot",
                                                width = 400, height = 400)
   jaspResults[["regBoostPlotOOBChangeDev"]] <- regBoostPlotOOBChangeDev
-  jaspResults[["regBoostPlotOOBChangeDev"]]$copyDependenciesFromJaspObject(jaspResults[["regBoostTable"]])
-  jaspResults[["regBoostPlotOOBChangeDev"]]$dependOnOptions("plotOOBChangeDev")
+  jaspResults[["regBoostPlotOOBChangeDev"]]$dependOn(optionsFromObject =jaspResults[["regBoostTable"]])
+  jaspResults[["regBoostPlotOOBChangeDev"]]$dependOn(options ="plotOOBChangeDev")
 }
 
 .regBoostPlotPredPerformance <- function(jaspResults, options, regBoostResults, ready) {
@@ -400,6 +397,6 @@ MLRegressionBoosting <- function(jaspResults, dataset, options, ...) {
   
   jaspResults[["plotPredPerformance"]] <- plotPredPerformance
   jaspResults[["plotPredPerformance"]]$position <- 7
-  jaspResults[["plotPredPerformance"]]$copyDependenciesFromJaspObject(jaspResults[["regBoostTable"]])
-  jaspResults[["plotPredPerformance"]]$dependOnOptions("plotPredPerformance")
+  jaspResults[["plotPredPerformance"]]$dependOn(optionsFromObject =jaspResults[["regBoostTable"]])
+  jaspResults[["plotPredPerformance"]]$dependOn(options ="plotPredPerformance")
 }

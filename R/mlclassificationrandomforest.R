@@ -17,9 +17,6 @@
 
 MLClassificationRandomForest <- function(jaspResults, dataset, options, ...) {
   
-  # Set title
-  jaspResults$title <- "Random Forest Classification"
-  
   # Read dataset
   if (options$target == "") options$target <- NULL
   dataset <- .readDataSetToEnd(columns.as.factor = options$target, columns = options$predictors,
@@ -139,7 +136,7 @@ MLClassificationRandomForest <- function(jaspResults, dataset, options, ...) {
   
   # Save results to state
   jaspResults[["stateclassRanForResults"]] <- createJaspState(results)
-  jaspResults[["stateclassRanForResults"]]$dependOnOptions(c("target", "predictors", "indicator", "noOfTrees",
+  jaspResults[["stateclassRanForResults"]]$dependOn(options =c("target", "predictors", "indicator", "noOfTrees",
                                                              "noOfPredictors", "numberOfPredictors", "dataTrain",
                                                              "bagFrac", "seedBox", "seed", "applyModel"))
   
@@ -168,7 +165,7 @@ MLClassificationRandomForest <- function(jaspResults, dataset, options, ...) {
   classRanForTable <- createJaspTable(title = "Random Forest Classification Model Summary")
   jaspResults[["classRanForTable"]] <- classRanForTable
   jaspResults[["classRanForTable"]]$position <- 1
-  jaspResults[["classRanForTable"]]$dependOnOptions(c("target", "predictors", "indicator", "noOfTrees",
+  jaspResults[["classRanForTable"]]$dependOn(options =c("target", "predictors", "indicator", "noOfTrees",
                                                       "noOfPredictors", "numberOfPredictors", "dataTrain",
                                                       "bagFrac", "seedBox", "seed", "applyModel"))
   
@@ -201,8 +198,8 @@ MLClassificationRandomForest <- function(jaspResults, dataset, options, ...) {
   classRanForConfTable <- createJaspTable(title = "Confusion Table")
   jaspResults[["classRanForConfTable"]] <- classRanForConfTable
   jaspResults[["classRanForConfTable"]]$position <- 2
-  jaspResults[["classRanForConfTable"]]$copyDependenciesFromJaspObject(jaspResults[["classRanForTable"]])
-  jaspResults[["classRanForConfTable"]]$dependOnOptions("classRanForConfTable")
+  jaspResults[["classRanForConfTable"]]$dependOn(optionsFromObject =jaspResults[["classRanForTable"]])
+  jaspResults[["classRanForConfTable"]]$dependOn(options ="classRanForConfTable")
   
   target <- .v(options$target)
   
@@ -263,8 +260,8 @@ MLClassificationRandomForest <- function(jaspResults, dataset, options, ...) {
   classRanForTableVarImp <- createJaspTable(title = "Variable Importance")
   jaspResults[["tableVarImp"]] <- classRanForTableVarImp
   jaspResults[["tableVarImp"]]$position <- 3
-  jaspResults[["tableVarImp"]]$copyDependenciesFromJaspObject(jaspResults[["classRanForTable"]])
-  jaspResults[["tableVarImp"]]$dependOnOptions(c("tableVariableImportance"))
+  jaspResults[["tableVarImp"]]$dependOn(optionsFromObject =jaspResults[["classRanForTable"]])
+  jaspResults[["tableVarImp"]]$dependOn(options =c("tableVariableImportance"))
   
   # Add column info
   classRanForTableVarImp$addColumnInfo(name = "predictor",  title = " ", type = "string")
@@ -291,7 +288,7 @@ MLClassificationRandomForest <- function(jaspResults, dataset, options, ...) {
   classRanForApplyTable <- createJaspTable(title = "Random Forest Model Predictions")
   jaspResults[["classRanForApplyTable"]] <- classRanForApplyTable
   jaspResults[["classRanForApplyTable"]]$position <- 4
-  jaspResults[["classRanForApplyTable"]]$copyDependenciesFromJaspObject(jaspResults[["classRanForTable"]])
+  jaspResults[["classRanForApplyTable"]]$dependOn(optionsFromObject =jaspResults[["classRanForTable"]])
   
   # Add column info
   classRanForApplyTable$addColumnInfo(name = "row",  title = "Row", type = "integer")
@@ -317,8 +314,8 @@ MLClassificationRandomForest <- function(jaspResults, dataset, options, ...) {
                                                  width = 400, height = 20 * nrow(classRanForResults$varImp) + 60)
   
   jaspResults[["varImpPlot1"]]$position <- 5
-  jaspResults[["varImpPlot1"]]$copyDependenciesFromJaspObject(jaspResults[["classRanForTable"]])
-  jaspResults[["varImpPlot1"]]$dependOnOptions("plotVarImp1")
+  jaspResults[["varImpPlot1"]]$dependOn(optionsFromObject =jaspResults[["classRanForTable"]])
+  jaspResults[["varImpPlot1"]]$dependOn(options ="plotVarImp1")
 }
 
 .classRanForPlotVarImp2 <- function(jaspResults, options, classRanForResults, ready) {
@@ -337,8 +334,8 @@ MLClassificationRandomForest <- function(jaspResults, dataset, options, ...) {
                                                  width = 400, height = 20 * nrow(classRanForResults$varImp) + 60)
   
   jaspResults[["varImpPlot2"]]$position <- 6
-  jaspResults[["varImpPlot2"]]$copyDependenciesFromJaspObject(jaspResults[["classRanForTable"]])
-  jaspResults[["varImpPlot2"]]$dependOnOptions("plotVarImp2")
+  jaspResults[["varImpPlot2"]]$dependOn(optionsFromObject =jaspResults[["classRanForTable"]])
+  jaspResults[["varImpPlot2"]]$dependOn(options ="plotVarImp2")
 }
 
 .classRanForPlotTreesVsModelError <- function(jaspResults, options, classRanForResults, ready) {
@@ -360,6 +357,6 @@ MLClassificationRandomForest <- function(jaspResults, dataset, options, ...) {
                                                    width = 400, height = 400)
   
   jaspResults[["plotTreesVsModelError"]]$position <- 7
-  jaspResults[["plotTreesVsModelError"]]$copyDependenciesFromJaspObject(jaspResults[["classRanForTable"]])
-  jaspResults[["plotTreesVsModelError"]]$dependOnOptions("plotTreesVsModelError")
+  jaspResults[["plotTreesVsModelError"]]$dependOn(optionsFromObject =jaspResults[["classRanForTable"]])
+  jaspResults[["plotTreesVsModelError"]]$dependOn(options ="plotTreesVsModelError")
 }

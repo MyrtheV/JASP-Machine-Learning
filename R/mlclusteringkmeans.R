@@ -17,20 +17,25 @@
 
 MLClusteringKMeans <- function(jaspResults, dataset, options, ...) {
 
-    jaspResults$title   <- "K-Means Clustering"
     # read variables ##
     dataset             <- .kMeansClusteringReadData(dataset, options)
+    
     # error handling & code variable names in base64
     .kMeansClusteringErrorHandling(dataset, options)
     ready               <- length(options[["predictors"]][options[["predictors"]] != ""] > 0)
+    
     # Run the analysis and save the results
     res                 <- .kMeansClustering(dataset, options, jaspResults, ready)
+    
     # create the evaluation table
     .kMeansClusteringSummaryTable(res, options, jaspResults, ready)
+    
     # create the cluster information table
     .kMeansClusteringInformationTable(options, res, jaspResults, ready)
-     # Create the cluster plot
+    
+    # Create the cluster plot
     .kMeansClusterPlot(dataset, options, res, jaspResults, ready)
+    
     # Create the within ss vs cluster plot
     .kMeansWithinSumOfSquaresPlot(options, res, jaspResults, ready)
 }
@@ -77,7 +82,7 @@ MLClusteringKMeans <- function(jaspResults, dataset, options, ...) {
         res <- list()
     }
     jaspResults[["res"]] <- createJaspState(res)
-    jaspResults[["res"]]$dependOnOptions(c("predictors", "noOfClusters","noOfRandomSets", "noOfIterations", "algorithm", "modelOpt", "seed", 
+    jaspResults[["res"]]$dependOn(options =c("predictors", "noOfClusters","noOfRandomSets", "noOfIterations", "algorithm", "modelOpt", "seed", 
                                               "maxClusters", "seedBox", "scaleEqualSD"))
 
     return(jaspResults[["res"]]$object)
@@ -183,7 +188,7 @@ MLClusteringKMeans <- function(jaspResults, dataset, options, ...) {
   evaluationTable                       <- createJaspTable("K-Means Clustering Model Summary")
   jaspResults[["evaluationTable"]]      <- evaluationTable
   jaspResults[["evaluationTable"]]$position <- 1
-  evaluationTable$dependOnOptions(c("predictors", "noOfClusters","noOfRandomSets", "noOfIterations", "algorithm",
+  evaluationTable$dependOn(options =c("predictors", "noOfClusters","noOfRandomSets", "noOfIterations", "algorithm",
                                       "aicweights", "modelOpt", "seed", "maxClusters", "scaleEqualSD"))
 
   evaluationTable$addColumnInfo(name = 'clusters', title = 'Clusters', type = 'integer')
@@ -221,7 +226,7 @@ MLClusteringKMeans <- function(jaspResults, dataset, options, ...) {
 
     clusterInfoTable                        <- createJaspTable("Cluster Information")
     jaspResults[["clusterInfoTable"]]       <- clusterInfoTable
-    clusterInfoTable$dependOnOptions(c("tableClusterInformation","predictors", "modelOpt",
+    clusterInfoTable$dependOn(options =c("tableClusterInformation","predictors", "modelOpt",
                                         "noOfClusters","noOfRandomSets", "tableClusterInfoSize",
                                         "tableClusterInfoSumSquares", "tableClusterInfoCentroids", "scaleEqualSD",
                                         "tableClusterInfoBetweenSumSquares", "tableClusterInfoTotalSumSquares", "maxClusters"))
@@ -292,7 +297,7 @@ MLClusteringKMeans <- function(jaspResults, dataset, options, ...) {
       p <- JASPgraphs::themeJasp(p)
       p <- p + ggplot2::theme(axis.ticks = ggplot2::element_blank(), axis.text.x = ggplot2::element_blank(), axis.text.y = ggplot2::element_blank())
       jaspResults[["plot2dCluster"]] 		<- createJaspPlot(plot = p, title= "T-sne Cluster Plot", width = 400, height = 300)
-      jaspResults[["plot2dCluster"]]		$dependOnOptions(c("predictors", "noOfClusters","noOfRandomSets", "noOfIterations", "algorithm",
+      jaspResults[["plot2dCluster"]]		$dependOn(options =c("predictors", "noOfClusters","noOfRandomSets", "noOfIterations", "algorithm",
                                           "aicweights", "modelOpt", "ready", "seed", "plot2dCluster", "maxClusters", "scaleEqualSD"))
       jaspResults[["plot2dCluster"]] 		$position <- 3
     }
@@ -322,7 +327,7 @@ MLClusteringKMeans <- function(jaspResults, dataset, options, ...) {
       p <- JASPgraphs::themeJasp(p)
    
      jaspResults[["optimPlot"]] 		 <- createJaspPlot(plot = p, title= "Within Sum of Squares Plot", height = 300, width = 400)
-     jaspResults[["optimPlot"]]		   $dependOnOptions(c("predictors", "noOfClusters","noOfRandomSets", "noOfIterations", "algorithm",
+     jaspResults[["optimPlot"]]		   $dependOn(options =c("predictors", "noOfClusters","noOfRandomSets", "noOfIterations", "algorithm",
                                          "aicweights", "modelOpt", "ready", "seed", "withinssPlot", "scaleEqualSD"))
      jaspResults[["optimPlot"]] 		 $position <- 4
      }

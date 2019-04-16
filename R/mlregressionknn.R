@@ -17,16 +17,19 @@
 
 MLRegressionKNN <- function(jaspResults, dataset, options, state=NULL) {
 
-		jaspResults$title 		<- 'K-Nearest Neighbors Regression'
 		# read variables ##
 	  dataset              	<- .knnClassificationReadData(dataset, options)
-	  # error handling ##
+	  
+		# error handling ##
 	  .knnClassificationErrorHandling(dataset, options)
 		ready <- length(options[["predictors"]][options[["predictors"]] != ""] > 0) && options[["target"]] != ""
+		
 		# Run the analysis
 		res <- .knnRegression(dataset, options, jaspResults, ready)
+		
 		# create the evaluation table
 		.knnRegressionSummaryTable(dataset, options, res, jaspResults, ready)
+		
 		# Create the Error vs K plot ##
 		.knnRegressionTestSetErrorPlot(dataset, options, res, jaspResults, ready)
 }
@@ -56,7 +59,7 @@ MLRegressionKNN <- function(jaspResults, dataset, options, state=NULL) {
 	res[["formula"]] <- formula
 
 	jaspResults[["res"]] <- createJaspState(res)
-  jaspResults[["res"]]$dependOnOptions(c("noOfNearestNeighbours", "trainingDataManual", "distanceParameterManual", "weights", "modelOpt",
+  jaspResults[["res"]]$dependOn(options =c("noOfNearestNeighbours", "trainingDataManual", "distanceParameterManual", "weights", "modelOpt",
                                     "scaleEqualSD", "noOfFolds", "predictors", "target", "maxK", "seed", "seedBox"))
 
 	return(jaspResults[["res"]]$object)
@@ -158,7 +161,7 @@ MLRegressionKNN <- function(jaspResults, dataset, options, state=NULL) {
 
   evaluationTable                       <- createJaspTable("Evaluation Table")
   jaspResults[["evaluationTable"]]      <- evaluationTable
-  evaluationTable$dependOnOptions(c("noOfNearestNeighbours", "trainingDataManual", "distanceParameterManual", "weights", "modelOpt",
+  evaluationTable$dependOn(options =c("noOfNearestNeighbours", "trainingDataManual", "distanceParameterManual", "weights", "modelOpt",
                                     "scaleEqualSD", "noOfFolds", "predictors", "target", "maxK", "seed", "seedBox"))
   evaluationTable$position <- 1
 
@@ -233,7 +236,7 @@ MLRegressionKNN <- function(jaspResults, dataset, options, state=NULL) {
        p <- JASPgraphs::themeJasp(p)
        
        jaspResults[["plotErrorVsK"]] 		<- createJaspPlot(plot = p, title = "Test Set Error Plot", width = 400, height = 300)
-       jaspResults[["plotErrorVsK"]]		$dependOnOptions(c("plotErrorVsK","noOfNearestNeighbours", "trainingDataManual", "distanceParameterManual", "weights", "scaleEqualSD", "modelOpt",
+       jaspResults[["plotErrorVsK"]]		$dependOn(options =c("plotErrorVsK","noOfNearestNeighbours", "trainingDataManual", "distanceParameterManual", "weights", "scaleEqualSD", "modelOpt",
                                                             "target", "predictors", "seed", "seedBox", "maxK"))
       jaspResults[["plotErrorVsK"]] 		$position <- 10
      }

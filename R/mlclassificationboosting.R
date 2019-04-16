@@ -17,9 +17,6 @@
 
 MLClassificationBoosting <- function(jaspResults, dataset, options, ...) {
   
-  # Set title
-  jaspResults$title <- "Boosting Classification"
-  
   # Read dataset
   dataset <- .classBoostReadData(dataset, options)
   
@@ -197,7 +194,7 @@ MLClassificationBoosting <- function(jaspResults, dataset, options, ...) {
   
   # Save results to state
   jaspResults[["stateClassBoostResults"]] <- createJaspState(results)
-  jaspResults[["stateClassBoostResults"]]$dependOnOptions(c("target", "predictors", "indicator", "applyModel",
+  jaspResults[["stateClassBoostResults"]]$dependOn(options =c("target", "predictors", "indicator", "applyModel",
                                                             "noOfTrees", "shrinkage", "intDepth", "modelOpt",
                                                             "cvFolds", "nNode", "dataTrain", "bagFrac", "seedBox",
                                                             "seed"))
@@ -213,7 +210,7 @@ MLClassificationBoosting <- function(jaspResults, dataset, options, ...) {
   classBoostTable <- createJaspTable(title = "Boosting Classification Model Summary")
   jaspResults[["classBoostTable"]] <- classBoostTable
   jaspResults[["classBoostTable"]]$position <- 1
-  jaspResults[["classBoostTable"]]$dependOnOptions(c("target", "predictors", "indicator", "applyModel", "noOfTrees",
+  jaspResults[["classBoostTable"]]$dependOn(options =c("target", "predictors", "indicator", "applyModel", "noOfTrees",
                                                      "shrinkage", "int.depth", "modelOpt", "cvFolds", "nNode",
                                                      "dataTrain", "bagFrac", "seedBox", "seed"))
   
@@ -248,8 +245,8 @@ MLClassificationBoosting <- function(jaspResults, dataset, options, ...) {
   classBoostConfTable <- createJaspTable(title = "Confusion Table")
   jaspResults[["classBoostConfTable"]] <- classBoostConfTable
   jaspResults[["classBoostConfTable"]]$position <- 2
-  jaspResults[["classBoostConfTable"]]$copyDependenciesFromJaspObject(jaspResults[["classBoostTable"]])
-  jaspResults[["classBoostConfTable"]]$dependOnOptions("classBoostConfTable")
+  jaspResults[["classBoostConfTable"]]$dependOn(optionsFromObject =jaspResults[["classBoostTable"]])
+  jaspResults[["classBoostConfTable"]]$dependOn(options ="classBoostConfTable")
   
   target <- .v(options$target)
 
@@ -310,8 +307,8 @@ MLClassificationBoosting <- function(jaspResults, dataset, options, ...) {
   classBoostRelInfTable <- createJaspTable(title = "Relative Influence")
   jaspResults[["classBoostRelInfTable"]] <- classBoostRelInfTable
   jaspResults[["classBoostRelInfTable"]]$position <- 3
-  jaspResults[["classBoostRelInfTable"]]$copyDependenciesFromJaspObject(jaspResults[["classBoostTable"]])
-  jaspResults[["classBoostRelInfTable"]]$dependOnOptions("classBoostRelInfTable")
+  jaspResults[["classBoostRelInfTable"]]$dependOn(optionsFromObject =jaspResults[["classBoostTable"]])
+  jaspResults[["classBoostRelInfTable"]]$dependOn(options ="classBoostRelInfTable")
   
   # Add column info
   classBoostRelInfTable$addColumnInfo(name = "predictor",  title = " ", type = "string")
@@ -330,8 +327,8 @@ MLClassificationBoosting <- function(jaspResults, dataset, options, ...) {
   classBoostApplyTable <- createJaspTable(title = "Boosting Model Predictions")
   jaspResults[["classBoostApplyTable"]] <- classBoostApplyTable
   jaspResults[["classBoostApplyTable"]]$position <- 4
-  jaspResults[["classBoostApplyTable"]]$copyDependenciesFromJaspObject(jaspResults[["classBoostTable"]])
-  jaspResults[["classBoostApplyTable"]]$dependOnOptions("applyModel")
+  jaspResults[["classBoostApplyTable"]]$dependOn(optionsFromObject =jaspResults[["classBoostTable"]])
+  jaspResults[["classBoostApplyTable"]]$dependOn(options ="applyModel")
   
   # Add column info
   classBoostApplyTable$addColumnInfo(name = "case",  title = "Case", type = "integer")
@@ -359,8 +356,8 @@ MLClassificationBoosting <- function(jaspResults, dataset, options, ...) {
   
   jaspResults[["classBoostRelInfPlot"]] <- classBoostRelInfPlot
   jaspResults[["classBoostRelInfPlot"]]$position <- 5
-  jaspResults[["classBoostRelInfPlot"]]$copyDependenciesFromJaspObject(jaspResults[["classBoostTable"]])
-  jaspResults[["classBoostRelInfPlot"]]$dependOnOptions("plotRelInf")
+  jaspResults[["classBoostRelInfPlot"]]$dependOn(optionsFromObject =jaspResults[["classBoostTable"]])
+  jaspResults[["classBoostRelInfPlot"]]$dependOn(options ="plotRelInf")
 }
 
 .classBoostPlotDeviance <- function(jaspResults, options, classBoostResults) {
@@ -392,8 +389,8 @@ MLClassificationBoosting <- function(jaspResults, dataset, options, ...) {
   plotDeviance <- createJaspPlot(plot = plotDeviance, title = "Deviance Plot", width = 500, height = 400)
   jaspResults[["plotDeviance"]] <- plotDeviance
   jaspResults[["plotDeviance"]]$position <- 6
-  jaspResults[["plotDeviance"]]$copyDependenciesFromJaspObject(jaspResults[["classBoostTable"]])
-  jaspResults[["plotDeviance"]]$dependOnOptions("plotDeviance")
+  jaspResults[["plotDeviance"]]$dependOn(optionsFromObject =jaspResults[["classBoostTable"]])
+  jaspResults[["plotDeviance"]]$dependOn(options ="plotDeviance")
 }
 
 .classBoostPlotOOBChangeDev <- function(jaspResults, options, classBoostResults) {
@@ -422,6 +419,6 @@ MLClassificationBoosting <- function(jaspResults, dataset, options, ...) {
   
   jaspResults[["classBoostPlotOOBChangeDev"]] <- classBoostPlotOOBChangeDev
   jaspResults[["classBoostPlotOOBChangeDev"]]$position <- 7
-  jaspResults[["classBoostPlotOOBChangeDev"]]$copyDependenciesFromJaspObject(jaspResults[["classBoostTable"]])
-  jaspResults[["classBoostPlotOOBChangeDev"]]$dependOnOptions("plotOOBChangeDev")
+  jaspResults[["classBoostPlotOOBChangeDev"]]$dependOn(optionsFromObject =jaspResults[["classBoostTable"]])
+  jaspResults[["classBoostPlotOOBChangeDev"]]$dependOn(options ="plotOOBChangeDev")
 }

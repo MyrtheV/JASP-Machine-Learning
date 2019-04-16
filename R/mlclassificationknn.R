@@ -17,24 +17,29 @@
 
 MLClassificationKNN <- function(jaspResults, dataset, options, ...) {
   
-    jaspResults$title   <- 'K-Nearest Neighbors Classification'
     # read variables ##
     dataset             <- .knnClassificationReadData(dataset, options)
+    
     # error handling ##
     .knnClassificationErrorHandling(dataset, options)
     ready <- length(options[["predictors"]][options[["predictors"]] != ""] > 0) && options[["target"]] != ""
+    
     # Run the analysis
     res                 <- .knnClassification(dataset, options, jaspResults, ready)
+    
     # create the evaluation table
     .knnClassificationSummaryTable(dataset, options, res, jaspResults, ready)
+    
     # Create the confusion table
     .knnClassificationConfusionMatrix(dataset, options, res, jaspResults, ready)
+    
     # Create the predictions table
     # .predictionsTableClassification(options, res, jaspResults, ready)
     # # Create the distances table
     # .distancesTableClassification(options, res, jaspResults, ready)
     # # Create the weights table ##
     # .weightsTableClassification(options, res, jaspResults, ready)
+    
     # Create the Error vs K plot ##
     .knnClassificationTestSetErrorPlot(dataset, options, res, jaspResults, ready)
 }
@@ -101,7 +106,7 @@ MLClassificationKNN <- function(jaspResults, dataset, options, ...) {
   res[["formula"]] <- formula
 
   jaspResults[["res"]] <- createJaspState(res)
-  jaspResults[["res"]]$dependOnOptions(c("noOfNearestNeighbours", "trainingDataManual", "distanceParameterManual", "weights", "scaleEqualSD", "modelOpt",
+  jaspResults[["res"]]$dependOn(options =c("noOfNearestNeighbours", "trainingDataManual", "distanceParameterManual", "weights", "scaleEqualSD", "modelOpt",
                                           "target", "predictors", "seed", "seedBox", "validationLeaveOneOut", "confusionProportions"))
 
   return(jaspResults[["res"]]$object)
@@ -219,7 +224,7 @@ MLClassificationKNN <- function(jaspResults, dataset, options, ...) {
 
   evaluationTable                       <- createJaspTable("K-Nearest Neighbors Classification Summary")
   jaspResults[["evaluationTable"]]      <- evaluationTable
-  evaluationTable$dependOnOptions(c("noOfNearestNeighbours", "trainingDataManual", "distanceParameterManual", "weights", "scaleEqualSD", "modelOpt",
+  evaluationTable$dependOn(options =c("noOfNearestNeighbours", "trainingDataManual", "distanceParameterManual", "weights", "scaleEqualSD", "modelOpt",
                                           "target", "predictors", "seed", "seedBox", "validationLeaveOneOut", "trainingError"))
   evaluationTable$position <- 1
 
@@ -259,7 +264,7 @@ MLClassificationKNN <- function(jaspResults, dataset, options, ...) {
 
   confusionTable                       <- createJaspTable("Confusion table")
   jaspResults[["confusionTable"]]      <- confusionTable
-  confusionTable$dependOnOptions(c("noOfNearestNeighbours", "trainingDataManual", "distanceParameterManual", "weights", "scaleEqualSD", "modelOpt",
+  confusionTable$dependOn(options =c("noOfNearestNeighbours", "trainingDataManual", "distanceParameterManual", "weights", "scaleEqualSD", "modelOpt",
                                           "target", "predictors", "seed", "seedBox", "confusionTable"))
   confusionTable$position <- 3
   
@@ -369,7 +374,7 @@ MLClassificationKNN <- function(jaspResults, dataset, options, ...) {
        p <- JASPgraphs::themeJasp(p)
        
        jaspResults[["plotErrorVsK"]] 		<- createJaspPlot(plot = p, title = "Classification Error Plot", width = 400, height = 300)
-       jaspResults[["plotErrorVsK"]]		$dependOnOptions(c("plotErrorVsK","noOfNearestNeighbours", "trainingDataManual", "distanceParameterManual", "weights", "scaleEqualSD", "modelOpt",
+       jaspResults[["plotErrorVsK"]]		$dependOn(options =c("plotErrorVsK","noOfNearestNeighbours", "trainingDataManual", "distanceParameterManual", "weights", "scaleEqualSD", "modelOpt",
                                                             "target", "predictors", "seed", "seedBox"))
       jaspResults[["plotErrorVsK"]] 		$position <- 10
      }
@@ -385,7 +390,7 @@ MLClassificationKNN <- function(jaspResults, dataset, options, ...) {
 # 
 #   distancesTable                       <- createJaspTable("Distances Table")
 #   jaspResults[["distancesTable"]]      <- distancesTable
-#   distancesTable$dependOnOptions(c("noOfNearestNeighbours", "nearestNeighboursCount", "percentageTrainingData",
+#   distancesTable$dependOn(options =c("noOfNearestNeighbours", "nearestNeighboursCount", "percentageTrainingData",
 #                                     "trainingDataManual", "distanceParameter", "distanceParameterManual", "weights",
 #                                     "optimizedFrom", "optimizedTo", "naAction", "predictionsFrom", "predictionsTo",
 #                                     "scaleEqualSD", "predictors", "target", "tableDistances"))
@@ -443,7 +448,7 @@ MLClassificationKNN <- function(jaspResults, dataset, options, ...) {
 # 
 #   weightsTable                       <- createJaspTable("Weights Table")
 #   jaspResults[["weightsTable"]]      <- weightsTable
-#   weightsTable$dependOnOptions(c("noOfNearestNeighbours", "nearestNeighboursCount", "percentageTrainingData",
+#   weightsTable$dependOn(options =c("noOfNearestNeighbours", "nearestNeighboursCount", "percentageTrainingData",
 #                                     "trainingDataManual", "distanceParameter", "distanceParameterManual", "weights",
 #                                     "optimizedFrom", "optimizedTo", "naAction", "predictionsFrom", "predictionsTo",
 #                                     "scaleEqualSD", "predictors", "target", "tableWeights"))
@@ -497,7 +502,7 @@ MLClassificationKNN <- function(jaspResults, dataset, options, ...) {
 # 
 #           predictionsTable                       <- createJaspTable("Predictions Table")
 #           jaspResults[["predictionsTable"]]      <- predictionsTable
-#           predictionsTable$dependOnOptions(c("noOfNearestNeighbours", "nearestNeighboursCount", "percentageTrainingData",
+#           predictionsTable$dependOn(options =c("noOfNearestNeighbours", "nearestNeighboursCount", "percentageTrainingData",
 #                                             "trainingDataManual", "distanceParameter", "distanceParameterManual", "weights",
 #                                             "optimizedFrom", "optimizedTo", "naAction", "predictionsFrom", "predictionsTo",
 #                                             "scaleEqualSD", "predictors", "target", "tablePredictions"))

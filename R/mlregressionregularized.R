@@ -17,9 +17,6 @@
 
 MLRegressionRegularized <- function(jaspResults, dataset, options, ...) {
   
-  # Set title
-  jaspResults$title <- "Regularized Linear Regression"
-  
   # Read dataset
   dataset <- .regRegReadData(dataset, options)
   
@@ -192,7 +189,7 @@ MLRegressionRegularized <- function(jaspResults, dataset, options, ...) {
   
   # Save results to state
   jaspResults[["stateRegRegResults"]] <- createJaspState(results)
-  jaspResults[["stateRegRegResults"]]$dependOnOptions(c("target", "predictors", "indicator", "weights", "penalty",
+  jaspResults[["stateRegRegResults"]]$dependOn(options =c("target", "predictors", "indicator", "weights", "penalty",
                                                         "applyModel", "alpha", "thresh", "dataTrain", "standardize",
                                                         "intercept", "shrinkage", "lambda", "seedBox", "seed"))
   
@@ -229,7 +226,7 @@ MLRegressionRegularized <- function(jaspResults, dataset, options, ...) {
   regRegTable                  <- createJaspTable(title = "Model Summary")
   regRegTable$position         <- 1
   jaspResults[["regRegTable"]] <- regRegTable
-  jaspResults[["regRegTable"]]$dependOnOptions(c("target", "predictors", "indicator", "weights", "penalty",
+  jaspResults[["regRegTable"]]$dependOn(options =c("target", "predictors", "indicator", "weights", "penalty",
                                                  "applyModel", "alpha", "thresh", "dataTrain", "standardize",
                                                  "intercept", "shrinkage", "lambda", "seedBox", "seed"))
   
@@ -289,8 +286,8 @@ MLRegressionRegularized <- function(jaspResults, dataset, options, ...) {
   regRegCoefTable                  <- createJaspTable(title = "Regression Coefficients")
   regRegCoefTable$position         <- 2
   jaspResults[["regRegCoefTable"]] <- regRegCoefTable
-  jaspResults[["regRegCoefTable"]]$copyDependenciesFromJaspObject(jaspResults[["regRegTable"]])
-  jaspResults[["regRegCoefTable"]]$dependOnOptions("regRegCoefTable")
+  jaspResults[["regRegCoefTable"]]$dependOn(optionsFromObject =jaspResults[["regRegTable"]])
+  jaspResults[["regRegCoefTable"]]$dependOn(options ="regRegCoefTable")
   
   # Add column info
   regRegCoefTable$addColumnInfo(name = "var",  title = " ", type = "string")
@@ -322,8 +319,8 @@ MLRegressionRegularized <- function(jaspResults, dataset, options, ...) {
   regRegApplyTable                  <- createJaspTable(title = "Regularized Regression Model Predictions")
   regRegApplyTable$position         <- 3
   jaspResults[["regRegApplyTable"]] <- regRegApplyTable
-  jaspResults[["regRegApplyTable"]]$copyDependenciesFromJaspObject(jaspResults[["regRegTable"]])
-  jaspResults[["regRegApplyTable"]]$dependOnOptions("applyModel")
+  jaspResults[["regRegApplyTable"]]$dependOn(optionsFromObject =jaspResults[["regRegTable"]])
+  jaspResults[["regRegApplyTable"]]$dependOn(options ="applyModel")
   
   # Add column info
   regRegApplyTable$addColumnInfo(name = "case",  title = "Case", type = "integer")
@@ -357,8 +354,8 @@ MLRegressionRegularized <- function(jaspResults, dataset, options, ...) {
   
   jaspResults[["regRegPredPerfPlot"]] <- regRegPredPerfPlot
   regRegPredPerfPlot$position         <- 4
-  jaspResults[["regRegPredPerfPlot"]]$copyDependenciesFromJaspObject(jaspResults[["regRegTable"]])
-  jaspResults[["regRegPredPerfPlot"]]$dependOnOptions("plotPredPerf")
+  jaspResults[["regRegPredPerfPlot"]]$dependOn(optionsFromObject =jaspResults[["regRegTable"]])
+  jaspResults[["regRegPredPerfPlot"]]$dependOn(options ="plotPredPerf")
 }
 
 .regRegCVLambdaPlot <- function(jaspResults, options, regRegResults, ready) {
@@ -391,6 +388,6 @@ MLRegressionRegularized <- function(jaspResults, dataset, options, ...) {
   
   jaspResults[["regRegCVLambdaPlot"]] <- regRegCVLambdaPlot
   regRegCVLambdaPlot$position         <- 5
-  jaspResults[["regRegCVLambdaPlot"]]$copyDependenciesFromJaspObject(jaspResults[["regRegTable"]])
-  jaspResults[["regRegCVLambdaPlot"]]$dependOnOptions("plotCVLambda")
+  jaspResults[["regRegCVLambdaPlot"]]$dependOn(optionsFromObject =jaspResults[["regRegTable"]])
+  jaspResults[["regRegCVLambdaPlot"]]$dependOn(options ="plotCVLambda")
 }

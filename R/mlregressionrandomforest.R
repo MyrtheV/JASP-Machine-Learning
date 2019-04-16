@@ -17,9 +17,6 @@
 
 MLRegressionRandomForest <- function(jaspResults, dataset, options, ...) {
   
-  # Set title
-  jaspResults$title <- "Random Forest Regression"
-  
   # Read dataset
   dataset <- .regRanForReadData(dataset, options)
   
@@ -169,7 +166,7 @@ MLRegressionRandomForest <- function(jaspResults, dataset, options, ...) {
   
   # Save results to state
   jaspResults[["stateregRanForResults"]] <- createJaspState(results)
-  jaspResults[["stateregRanForResults"]]$dependOnOptions(c("target", "predictors", "indicator", "applyModel",
+  jaspResults[["stateregRanForResults"]]$dependOn(options =c("target", "predictors", "indicator", "applyModel",
                                                            "noOfTrees", "noOfPredictors", "numberOfPredictors",
                                                            "dataTrain", "bagFrac", "seedBox", "seed"))
   
@@ -197,7 +194,7 @@ MLRegressionRandomForest <- function(jaspResults, dataset, options, ...) {
   regRanForTable <- createJaspTable(title = "Random Forest Regression Model Summary")
   jaspResults[["regRanForTable"]] <- regRanForTable
   jaspResults[["regRanForTable"]]$position <- 1
-  jaspResults[["regRanForTable"]]$dependOnOptions(c("target", "predictors", "indicator", "applyModel",
+  jaspResults[["regRanForTable"]]$dependOn(options =c("target", "predictors", "indicator", "applyModel",
                                                     "noOfTrees", "noOfPredictors", "numberOfPredictors",
                                                     "dataTrain", "bagFrac", "seedBox", "seed"))
   
@@ -229,8 +226,8 @@ MLRegressionRandomForest <- function(jaspResults, dataset, options, ...) {
   regRanForVarImpTable <- createJaspTable(title = "Variable Importance")
   jaspResults[["regRanForVarImpTable"]] <- regRanForVarImpTable
   jaspResults[["regRanForVarImpTable"]]$position <- 2
-  jaspResults[["regRanForVarImpTable"]]$copyDependenciesFromJaspObject(jaspResults[["regRanForTable"]])
-  jaspResults[["regRanForVarImpTable"]]$dependOnOptions("regRanForVarImpTable")
+  jaspResults[["regRanForVarImpTable"]]$dependOn(optionsFromObject =jaspResults[["regRanForTable"]])
+  jaspResults[["regRanForVarImpTable"]]$dependOn(options ="regRanForVarImpTable")
   
   # Add column info
   regRanForVarImpTable$addColumnInfo(name = "predictor",  title = " ", type = "string")
@@ -253,8 +250,8 @@ MLRegressionRandomForest <- function(jaspResults, dataset, options, ...) {
   regRanForApplyTable <- createJaspTable(title = "Random Forest Model Predictions")
   jaspResults[["regRanForApplyTable"]] <- regRanForApplyTable
   jaspResults[["regRanForApplyTable"]]$position <- 3
-  jaspResults[["regRanForApplyTable"]]$copyDependenciesFromJaspObject(jaspResults[["regRanForTable"]])
-  jaspResults[["regRanForApplyTable"]]$dependOnOptions("applyModel")
+  jaspResults[["regRanForApplyTable"]]$dependOn(optionsFromObject =jaspResults[["regRanForTable"]])
+  jaspResults[["regRanForApplyTable"]]$dependOn(options ="applyModel")
   
   # Add column info
   regRanForApplyTable$addColumnInfo(name = "row",  title = "Row", type = "integer")
@@ -282,8 +279,8 @@ MLRegressionRandomForest <- function(jaspResults, dataset, options, ...) {
   
   jaspResults[["regRanForPlotVarImpAcc"]] <- regRanForPlotVarImpAcc
   jaspResults[["regRanForPlotVarImpAcc"]]$position <- 4
-  jaspResults[["regRanForPlotVarImpAcc"]]$copyDependenciesFromJaspObject(jaspResults[["regRanForTable"]])
-  jaspResults[["regRanForPlotVarImpAcc"]]$dependOnOptions("plotVarImpAcc")
+  jaspResults[["regRanForPlotVarImpAcc"]]$dependOn(optionsFromObject =jaspResults[["regRanForTable"]])
+  jaspResults[["regRanForPlotVarImpAcc"]]$dependOn(options ="plotVarImpAcc")
 }
 
 .regRanForPlotVarImpPur <- function(jaspResults, options, regRanForResults, ready) {
@@ -303,8 +300,8 @@ MLRegressionRandomForest <- function(jaspResults, dataset, options, ...) {
   
   jaspResults[["regRanForPlotVarImpPur"]] <- regRanForPlotVarImpPur
   jaspResults[["regRanForPlotVarImpPur"]]$position <- 5
-  jaspResults[["regRanForPlotVarImpPur"]]$copyDependenciesFromJaspObject(jaspResults[["regRanForTable"]])
-  jaspResults[["regRanForPlotVarImpPur"]]$dependOnOptions("plotVarImpPur")
+  jaspResults[["regRanForPlotVarImpPur"]]$dependOn(optionsFromObject =jaspResults[["regRanForTable"]])
+  jaspResults[["regRanForPlotVarImpPur"]]$dependOn(options ="plotVarImpPur")
 }
 
 .regRanForPlotTreesVsModelError <- function(jaspResults, options, regRanForResults, ready) {
@@ -327,8 +324,8 @@ MLRegressionRandomForest <- function(jaspResults, dataset, options, ...) {
   
   jaspResults[["plotTreesVsModelError"]] <- plotTreesVsModelError
   jaspResults[["plotTreesVsModelError"]]$position <- 6
-  jaspResults[["plotTreesVsModelError"]]$copyDependenciesFromJaspObject(jaspResults[["regRanForTable"]])
-  jaspResults[["plotTreesVsModelError"]]$dependOnOptions("plotTreesVsModelError")
+  jaspResults[["plotTreesVsModelError"]]$dependOn(optionsFromObject =jaspResults[["regRanForTable"]])
+  jaspResults[["plotTreesVsModelError"]]$dependOn(options ="plotTreesVsModelError")
   
 }
 
@@ -361,6 +358,6 @@ MLRegressionRandomForest <- function(jaspResults, dataset, options, ...) {
   
   jaspResults[["plotPredPerformance"]] <- plotPredPerformance
   jaspResults[["plotPredPerformance"]]$position <- 7
-  jaspResults[["plotPredPerformance"]]$copyDependenciesFromJaspObject(jaspResults[["regRanForTable"]])
-  jaspResults[["plotPredPerformance"]]$dependOnOptions("plotPredPerformance")
+  jaspResults[["plotPredPerformance"]]$dependOn(optionsFromObject =jaspResults[["regRanForTable"]])
+  jaspResults[["plotPredPerformance"]]$dependOn(options ="plotPredPerformance")
 }
