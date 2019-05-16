@@ -37,7 +37,9 @@ MLClassificationLDA <- function(jaspResults, dataset, options, ...) {
   .ldaTableMain(jaspResults, options, classLdaResults, ready)
   .ldaConfTable(jaspResults, options, classLdaResults, dataset, ready) 
   .ldaCoefTable(jaspResults, options, classLdaResults, dataset, ready)
-  
+  .ldaPriorTable(jaspResults, options, classLdaResults, dataset, ready)
+  .modelContainer(jaspResults, options, classLdaResults, dataset, ready)
+
   return()    
 }
 
@@ -158,10 +160,9 @@ MLClassificationLDA <- function(jaspResults, dataset, options, ...) {
   
   # Run LDA 
   results[["res"]] <- MASS::lda(formula = formula, data = trainData, method = method, CV = CV) # prior is missing, nu too
-  
+
   results[["data"]] <- list(trainData = trainData, testData = testData, testTarget = testTarget) 
   results[["relInf"]] <- summary(results$res, plot = FALSE)
-  browser()
   results[["meanTable"]] <- as.table(results$res$means) 
   
   # Predictions 
@@ -197,81 +198,47 @@ MLClassificationLDA <- function(jaspResults, dataset, options, ...) {
   
 }
 
+.modelContainer <- function(jaspResults, options, classLdaResults, dataset, ready){
+  modelContainer <- createJaspContainer(title = "Training Information")  
+
+  jaspResults[["modelContainer"]] <- modelContainer 
+  modelContainer$dependOn(options = c("classLdaMeanTable"))
+}
+  
 # Compute tables 
-.ldaTableMean <- function(jaspResults, options, classLdaResults, dataset, ready){
-  if (!is.null(jaspResults[["ldaTableMean"]])) return()
-  browser()
-  # Create table 
-  ldaTableMean <- createJaspTable(title= "Group Means")
-  jaspResults[["ldaTableMean"]] <- ldaTableMean
-  jaspResults[["ldaTableMean"]]$position <- 3
-  jaspResults[["ldaTableMean"]]$dependOn(options = c("target", "predictors", "indicator", "applyModel", # prior nog niet erbij
-                                                     "modelOpt", "validationLeaveOneOut", "estimationMethod", "moment", "mle", "covMve", 
-                                                     "dataTrain", "seedBox",
-                                                     "seed"))
-  # Add column info 
+  .ldaTableMean <- function(jaspResults, options, classLdaResults, dataset, ready){
+    if (!is.null(jaspResults[["ldaTableMean"]]) || !options$classLdaMeanTable) return()
 
-  # From this on it works: 
-  # ldaTableMean$addColumnInfo(name = "groupmeans", title = "Group Means", type = "integer")
+    # Create table 
+    ldaTableMean <- createJaspTable(title= "Group Means")
+    ldaTableMean$dependOn(options = "classLdaMeanTable", optionsFromObject = jaspResults[["stateClassLdaResults"]])
+    
+    # Add column info 
+    ldaTableMean$addColumnInfo(name = "target_level", title = "", type = "string")
+    
+    jaspResults[["modelContainer"]][["ldaTableMean"]] <- ldaTableMean
+    jaspResults[["modelContainer"]][["ldaTableMean"]]$position <- 5
+    
+    target <- .v(options$target)
 
-  # Add data
-  # ldaTableMean[["groupmeans"]] <- if (ready) classLdaResults$res$means  else "."
-
-  target <- .v(options$target)
-
-  if (ready) {
-
-    ldaTableMean$addColumnInfo(name = "pred_name", title = "", type = "string")
-    ldaTableMean$addColumnInfo(name = "varname_pred", title = "", type = "string")
-
-    ldaTableMean[["pred_name"]] <- c("Predicted", rep("", nrow(classLdaResults$confTable)-1))
-    ldaTableMean[["varname_pred"]] <- colnames(classLdaResults$confTable)
-
-    for (i in 1:length(rownames(classLdaResults$confTable))) {
-
-      name <- paste("varname_obs", i, sep = "")
-      ldaTableMean$addColumnInfo(name = name, title = as.character(rownames(classLdaResults$confTable)[i]),
-                                 type = "integer", overtitle = "Observed")
-      ldaTableMean[[name]] <- classLdaResults$confTable[, i]
-
+    if (ready) {
+      
+      for (predictor in options$predictors)
+        ldaTableMean$addColumnInfo(name = predictor, type = "number")
+      
+      groupMeans <- classLdaResults[["res"]][["means"]]
+      colnames(groupMeans) <- .unv(colnames(groupMeans))
+      groupMeans <- cbind(target_level = rownames(groupMeans), as.data.frame(groupMeans))
+      
+      ldaTableMean$setData(groupMeans)
+      
     }
-
-  } else if (options$target != "" && !ready) {
-
-    ldaTableMean$addColumnInfo(name = "pred_name", title = "", type = "string")
-    ldaTableMean$addColumnInfo(name = "varname_pred", title = "", type = "string")
-
-    ldaTableMean[["pred_name"]] <- c("Predicted", rep("", length(unique(dataset[, target])) - 1))
-    ldaTableMean[["varname_pred"]] <- levels(dataset[, target])
-
-    for (i in 1:length(unique(dataset[, target]))) {
-
-      name <- paste("varname_obs", i, sep = "")
-      ldaTableMean$addColumnInfo(name = name, title = as.character(levels(dataset[, target])[i]),
-                                 type = "integer", overtitle = "Observed")
-      ldaTableMean[[name]] <- rep(".", length(unique(dataset[, target])))
-
-    }
-
-  } else {
-
-    ldaTableMean$addColumnInfo(name = "pred_name"    , title = "" , type = "string")
-    ldaTableMean$addColumnInfo(name = "varname_pred" , title = "" , type = "string")
-    ldaTableMean$addColumnInfo(name = "varname_obs1", title = ".", type = "integer")
-    ldaTableMean$addColumnInfo(name = "varname_obs2", title = ".", type = 'integer')
-
-    ldaTableMean[["pred_name"]] <- c("Predicted", "")
-    ldaTableMean[["varname_pred"]] <- rep(".", 2)
-    ldaTableMean[["varname_obs1"]] <- rep("", 2)
-    ldaTableMean[["varname_obs2"]] <- rep("", 2)
-
-  }
   
 }
 
 .ldaTableMain <- function(jaspResults, options, classLdaResults, ready){
   if (!is.null(jaspResults[["ldaTableMain"]])) return()
-  
+
   # Create table 
   ldaTableMain <- createJaspTable(title = "LDA Model Summary")
   jaspResults[["ldaTableMain"]] <- ldaTableMain
@@ -298,12 +265,12 @@ MLClassificationLDA <- function(jaspResults, dataset, options, ...) {
 }
 
 .ldaConfTable <- function(jaspResults, options, classLdaResults, dataset, ready){
-  if (!is.null(jaspResults[["ldaConfTable"]])) return()
+  if (!is.null(jaspResults[["ldaConfTable"]]) || !options$classLdaConfTable) return()
   
   # Create table 
   ldaConfTable <- createJaspTable(title = "Confusion Table")
-  #ldaConfTable$dependOn("ldaConfTable", optionsFromObject=jaspResults[["ldaTableMain"]])
-  jaspResults[["ldaconfTable"]] <- ldaConfTable
+  ldaConfTable$dependOn(options = "classLdaConfTable", optionsFromObject=jaspResults[["ldaTableMain"]])
+  jaspResults[["ldaConfTable"]] <- ldaConfTable
   jaspResults[["ldaConfTable"]]$position <- 2
   
   target <- .v(options$target)
@@ -359,17 +326,56 @@ MLClassificationLDA <- function(jaspResults, dataset, options, ...) {
 }
 
 .ldaCoefTable <- function(jaspResults, options, classLdaResults, dataset, ready){
-  if (!is.null(jaspResults[["ldaCoefTable"]])) return()
+  if (!is.null(jaspResults[["ldaCoefTable"]]) || !options$classLdaCoefloadTable) return()
   
+  # Create table 
   ldaCoefTable <- createJaspTable(title = "Coefficients of Linear Discriminants")
+  ldaCoefTable$dependOn(options = "classLdaCoefloadTable", optionsFromObject = jaspResults[["stateClassLdaResults"]])
+  
   jaspResults[["ldaCoefTable"]] <- ldaCoefTable
   jaspResults[["ldaCoefTable"]]$position <- 4
-  jaspResults[["ldaCoefTable"]]$dependOn(options = c("target", "predictors", "indicator", "applyModel", # prior nog niet erbij
-                                                     "modelOpt", "validationLeaveOneOut", "estimationMethod", "moment", "mle", "covMve", 
-                                                     "dataTrain", "seedBox",
-                                                     "seed"))
   
   # Add column info 
-  ldaCoefTable$addColumnInfo(name = "", title = "", type = "integer")
+  ldaCoefTable$addColumnInfo(name = "pred_level", title = "", type = "string")
+  
+  target <- .v(options$target)
+  
+  if (ready) {
+    
+    for (ldacoef in colnames(classLdaResults[["res"]][["scaling"]]))
+      ldaCoefTable$addColumnInfo(name = ldacoef, type = "number")
+
+    Coeflda <- classLdaResults[["res"]][["scaling"]]
+    colnames(Coeflda) <- colnames(Coeflda)
+    Coeflda <- cbind(pred_level = .unv(rownames(Coeflda)), as.data.frame(Coeflda))
+    
+    ldaCoefTable$setData(Coeflda)
+    
+  }
+  
+  
+}
+
+.ldaPriorTable <- function(jaspResults, options, classLdaResults, dataset, ready){
+  if (!is.null(jaspResults[["ldaPriorTable"]]) || !options$classLdaPriorTable) return()
+  
+  # Create table 
+  ldaPriorTable <- createJaspTable(title = "Prior probabilities of groups")
+  ldaPriorTable$dependOn(options = "classLdaPriorTable", optionsFromObject = jaspResults[["stateClassLdaResults"]])
+  
+  jaspResults[["ldaPriorTable"]] <- ldaPriorTable 
+  jaspResults[["ldaPriorTable"]]$position <- 3
+  
+  # Add column info 
+  
+  if(ready) {
+    
+    
+    levelPriors <- classLdaResults[["res"]][["prior"]]
+    
+    ldaPriorTable$setData(levelPriors)
+    
+  }
+  
   
 }

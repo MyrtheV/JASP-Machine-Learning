@@ -42,8 +42,10 @@ Form
     GroupBox {
         title: qsTr("Tables")
 
-        CheckBox { name: "classBoostConfTable";	    text: qsTr("Confusion matrix"); checked: true      }
-        CheckBox { name: "classBoostRelInfTable";	text: qsTr("Relative influence")            }
+        CheckBox { name: "classLdaConfTable";	    text: qsTr("Confusion matrix"); checked: true      }
+        CheckBox { name: "classLdaPriorTable";	    text: qsTr("Prior probabilities of groups")            }
+        CheckBox { name: "classLdaCoefloadTable";   text: qsTr("Coefficients linear discriminants")       }
+        CheckBox { name: "classLdaMeanTable";       text: qsTr("Means training data")             }
               }
 
 
