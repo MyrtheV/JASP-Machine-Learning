@@ -32,6 +32,7 @@ MLClassificationLDA <- function(jaspResults, dataset, options, ...) {
   #modelContainer <- createJaspContainer(title="titel")
   #jaspResults[["modelContainer"]] <- modelContainer
   # Compute (a list of) results from which tables and plots can be created
+  classLdaResults <- NULL
   if (ready) error <- .classLdaErrorHandling(dataset, options)
   if (ready) classLdaResults <- .classLdaComputeResults(jaspResults, dataset, options)
   
@@ -43,7 +44,7 @@ MLClassificationLDA <- function(jaspResults, dataset, options, ...) {
   .ldaPriorTable(jaspResults, options, classLdaResults, dataset, ready)
   
   # Plots 
-  .ldaMatrixPlot(jaspResults, options, classLdaResults, dataset, ready)
+  #.ldaMatrixPlot(jaspResults, options, classLdaResults, dataset, ready)
   #browser()
   .ldaMatricesPlot(jaspResults, options, classLdaResults, dataset, ready)
 
@@ -411,42 +412,46 @@ MLClassificationLDA <- function(jaspResults, dataset, options, ...) {
 
 }
 
-.ldaMatrixPlot <- function(jaspResults, options, classLdaResults, dataset, ready){
-  if (!is.null(jaspResults[["ldaMatrixPlot"]]) || !options$matrixplot) return()
-
-  ldaMatrixPlot <- createJaspPlot(title = "Matrix Plot",  width = 400, height = 320)
-  ldaMatrixPlot$dependOn(options = "matrixplot", optionsFromObject = jaspResults[["stateClassLdaResults"]])
-  jaspResults[["ldaMatrixPlot"]] <- ldaMatrixPlot 
-
-  .ldaMatrixFillPlotDescriptives(ldaMatrixPlot, classLdaResults, dataset, options)
-
-  
-  return()
-  
-}
-
-.ldaMatrixFillPlotDescriptives <- function(ldaMatrixPlot, classLdaResults, dataset, options){
- #browser()
-  #if (options$target == 2){}
-  # one curve 
-  
-  #else ()
-  # more curves 
-  
-  lda.fit.scaled <- cbind.data.frame(scale(as.matrix(classLdaResults[["trainData"]][,.v(options$predictors)]), 
-                                              scale = FALSE) %*% classLdaResults[["res"]]$scaling, V2 = classLdaResults[["trainData"]][,.v(options$target)])
-  
-  # Change x for every discriminant 
-  
-  plot <- JASPgraphs::themeJasp(ggplot2::ggplot(data = lda.fit.scaled, ggplot2::aes(x = LD1, group = as.factor(V2), color = as.factor(V2), show.legend = TRUE)) +
-    ggplot2::geom_line(stat = "density"), legend.position = "right", legend.title = "Predictor")
-  
-  
-  ldaMatrixPlot$plotObject <- plot
-  
-  return()
-  
-}
+# .ldaMatrixPlot <- function(jaspResults, options, classLdaResults, dataset, ready){
+#   if (!is.null(jaspResults[["ldaMatrixPlot"]]) || !options$matrixplot) return()
+# 
+#   ldaMatrixPlot <- createJaspPlot(title = "Matrix Plot",  width = 400, height = 320)
+#   ldaMatrixPlot$dependOn(options = "matrixplot", optionsFromObject = jaspResults[["stateClassLdaResults"]])
+#   jaspResults[["ldaMatrixPlot"]] <- ldaMatrixPlot 
+# 
+#   if(!ready)
+#     return()
+#   
+#   # fill 
+#   .ldaMatrixFillPlotDescriptives(ldaMatrixPlot, classLdaResults, dataset, options)
+# 
+#   
+#   return()
+#   
+# }
+# 
+# .ldaMatrixFillPlotDescriptives <- function(ldaMatrixPlot, classLdaResults, dataset, options){
+#  #browser()
+#   #if (options$target == 2){}
+#   # one curve 
+#   
+#   #else ()
+#   # more curves 
+#   
+#   lda.fit.scaled <- cbind.data.frame(scale(as.matrix(classLdaResults[["trainData"]][,.v(options$predictors)]), 
+#                                               scale = FALSE) %*% classLdaResults[["res"]]$scaling, V2 = classLdaResults[["trainData"]][,.v(options$target)])
+#   
+#   # Change x for every discriminant 
+#   
+#   plot <- JASPgraphs::themeJasp(ggplot2::ggplot(data = lda.fit.scaled, ggplot2::aes(x = LD1, group = as.factor(V2), color = as.factor(V2), show.legend = TRUE)) +
+#     ggplot2::geom_line(stat = "density"), legend.position = "right", legend.title = "Predictor")
+#   
+#   
+#   ldaMatrixPlot$plotObject <- plot
+#   
+#   return()
+#   
+# }
 
 .ldaMatricesPlot <- function(jaspResults, options, classLdaResults, dataset, ready){
   if (!is.null(jaspResults[["ldaMatricesPlot"]]) || !options$matrixplot) return()
@@ -454,8 +459,11 @@ MLClassificationLDA <- function(jaspResults, dataset, options, ...) {
   ldaMatricesPlot <- createJaspPlot(title = "Matrices Plot")
   ldaMatricesPlot$dependOn(options = "matrixplot", optionsFromObject = jaspResults[["stateClassLdaResults"]])
   jaspResults[["ldaMatricesPlot"]] <- ldaMatricesPlot 
-  ldaMatricesPlot$plotObject <- .ldaMatricesFillPlotDescriptives(classLdaResults, dataset, options)
+
+  if(!ready)
+    return()
   
+  ldaMatricesPlot$plotObject <- .ldaMatricesFillPlotDescriptives(classLdaResults, dataset, options)
   
   return()
 }
@@ -620,7 +628,7 @@ MLClassificationLDA <- function(jaspResults, dataset, options, ...) {
             }
             
             if (col == 1 && row == 2){
-              plotMat[[2, 1]] <- .ldaLegend(classLdaResults, options, col) + adjMargin # plot marginal (histogram with density estimator)
+              plotMat[[2, 1]] <- .ldaLegend(classLdaResults, options, col) #+ adjMargin # plot marginal (histogram with density estimator)
   
             }
             
@@ -689,7 +697,7 @@ MLClassificationLDA <- function(jaspResults, dataset, options, ...) {
     
     p <- ggplot2::ggplot(data = lda.fit.scaled, ggplot2::aes(x = lda.fit.scaled[,paste("LD", col, sep = "")], group = as.factor(V2), color = as.factor(V2), show.legend = TRUE)) +
                                     ggplot2::geom_line(stat = "density")
-    p <- p + ggplot2::ylab("Density") + ggplot2::xlab(paste("LD", col, sep = ""))
+    p <- p + ggplot2::ylab("Density") + ggplot2::xlab("") # + ggplot2::xlab(paste("LD", col, sep = ""))
   
   } else {
     lda.fit.scaled <- cbind.data.frame(scale(as.matrix(classLdaResults[["trainData"]][,.v(options$predictors)]), 
@@ -699,10 +707,10 @@ MLClassificationLDA <- function(jaspResults, dataset, options, ...) {
     
     p <- ggplot2::ggplot(data = lda.fit.scaled, ggplot2::aes(x = lda.fit.scaled[,paste("LD", col, sep = "")], group = as.factor(V2), color = as.factor(V2), show.legend = FALSE)) +
       ggplot2::geom_line(stat = "density")
-    p <- p + ggplot2::ylab("Density") + ggplot2::xlab(paste("LD", col, sep = ""))
+    p <- p + ggplot2::ylab("Density") + ggplot2::xlab("") # + ggplot2::xlab(paste("LD", col, sep = ""))
     
   }
-  return(JASPgraphs::themeJasp(p, xAxis = TRUE, yAxis = TRUE, legend.position = c(1,1), legend.justification = c(1,1), legend.title = "Predictor"))
+  return(JASPgraphs::themeJasp(p, xAxis = TRUE, yAxis = TRUE))
 }
 
 .ldaScatterPlot <- function(classLdaResults, options, col){
@@ -710,12 +718,13 @@ MLClassificationLDA <- function(jaspResults, dataset, options, ...) {
   model <- classLdaResults[["res"]]
   lda.data <- cbind(data, stats::predict(model)$x[,c(col - 1, col)])
   
-  p <- ggplot2::ggplot(lda.data, ggplot2::aes(x = lda.data[,paste("LD", col - 1, sep = "")], y = lda.data[,paste("LD", col, sep = "")])) +
+  p <- ggplot2::ggplot(lda.data, ggplot2::aes(y = lda.data[,paste("LD", col - 1, sep = "")], x = lda.data[,paste("LD", col, sep = "")], show.legend = FALSE)) +
     ggplot2::geom_point(ggplot2::aes(color = lda.data[,.v(options$target)])) + 
-    ggplot2::xlab(paste("LD", col - 1, sep = "")) + ggplot2::ylab(paste("LD", col, sep = ""))  
+    ggplot2::ylab("") + ggplot2::xlab("")
+    #ggplot2::ylab(paste("LD", col - 1, sep = "")) + ggplot2::xlab(paste("LD", col, sep = ""))  
   p <- p + ggplot2::labs(color=options$target)
   
-  return(JASPgraphs::themeJasp(p, legend.position = "right"))
+  return(JASPgraphs::themeJasp(p))
 }
 
 .ldaLegend <- function(classLdaResults, options, col){
@@ -726,15 +735,18 @@ MLClassificationLDA <- function(jaspResults, dataset, options, ...) {
   
   p <- ggplot2::ggplot(data = lda.fit.scaled, ggplot2::aes(x = lda.fit.scaled[,paste("LD", col, sep = "")], group = as.factor(V2), color = as.factor(V2), show.legend = TRUE)) +
     ggplot2::geom_line(stat = "density")
-  p <- p + ggplot2::ylab("Density") + ggplot2::xlab(paste("LD", col, sep = ""))
+  p <- p + ggplot2::ylab("Density") + ggplot2::xlab(paste("LD", col, sep = "")) 
+  p <- p + ggplot2::labs(color = options$target)
+  p <- p + ggplot2::theme(legend.key = ggplot2::element_blank())
   
   g_legend <- function(a.gplot){ 
     tmp <- ggplot2::ggplot_gtable(ggplot2::ggplot_build(a.gplot)) 
     leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box") 
     legend <- tmp$grobs[[leg]] 
   }
-  
+  png(tempfile())
   legend <- g_legend(p)
+  dev.off()
   
  return(legend)
   
